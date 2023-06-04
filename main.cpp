@@ -5,8 +5,6 @@
 #include "MusicSample.h"
 #include "MP3Player.h"
 
-
-
 int main() 
 {
     Music music1(name1,pitchs1,lyrics1,beats1,length1);

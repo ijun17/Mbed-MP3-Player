@@ -1,10 +1,9 @@
 #include <string>
 using namespace std;
-
+//string lyrics1[25]={"떴","다","떴","다","비","행","기","날","아","라","날","아","라","높","이","높","이","날","아","라","우","리","비","행","기"};
 
 //Sample1
 string name1="Plane In The Sky";
-//string lyrics1[25]={"떴","다","떴","다","비","행","기","날","아","라","날","아","라","높","이","높","이","날","아","라","우","리","비","행","기"};
 string lyrics1[25]={"Ri","sing ","Ri","sing ","Air","pl","ane ","fly ","a","way ","fly ","a","way ",
                     "High","er ","High","er ","fly ","a","way ","Ou","r","air","pl","ane"};
 string pitchs1[25]={"E4","D4","C4","D4","E4","E4","E4","D4","D4","D4","E4","E4","E4",

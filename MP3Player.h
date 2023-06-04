@@ -38,14 +38,10 @@ public:
         lcd.setCursor(TextLCD::CurOff_BlkOff);
     }
 
-    void start() { // LCD를 초기화
-        lcd.setMode(TextLCD::DispOn);
-        lcd.setBacklight(TextLCD::LightOff);
-        lcd.setCursor(TextLCD::CurOff_BlkOff);
-
+    void start() {
+        mp3_state = menu;
         selectMusicId = 0;
         selectedMusicName = musicList[selectMusicId].getName();
-        mp3_state = menu;
         lcdUpdate("[MP3] menu", "> "+selectedMusicName);
 
         wait(1);
@@ -55,14 +51,12 @@ public:
             if(button1.read()){
                 if(mp3_state==menu)nextMusic();
                 else pauseMusic();
-                wait(0.5);
                 restartNameTimer();
             }
             //버튼 2 : 재생, 중지
             if(button2.read()){
                 if(mp3_state==menu)playMusic();
                 else stopMusic();
-                wait(0.5);
                 restartNameTimer();
             }
             //가사 출력
@@ -74,7 +68,6 @@ public:
                 }
                 if(!musicList[selectMusicId].isPlaying()){
                     stopMusic();
-                    wait(0.5);
                     restartNameTimer();
                 }
             }
@@ -97,31 +90,36 @@ public:
         if (++selectMusicId == musicList.size())selectMusicId = 0;
         lcdUpdate("", "> "+musicList[selectMusicId].getName());
         selectedMusicName = musicList[selectMusicId].getName();
+        wait(0.5); //위치 중요
     }
 
     void pauseMusic() { //노래를 일시정지
         if(mp3_state==playing){
+            lcdUpdate("[MP3] pause", "");
             musicList[selectMusicId].pause(buzzer);
             mp3_state=pause;
-            lcdUpdate("[MP3] pause", "");
+            wait(0.5); //위치 중요
         }else{
+            lcdUpdate("[MP3] playing", "");
+            wait(0.5); //위치 중요
             musicList[selectMusicId].unpause(buzzer);
             mp3_state=playing;
-            lcdUpdate("[MP3] playing", "");
+            
         }
     }
 
     void stopMusic() { //노래를 중지
-        musicList[selectMusicId].stop(buzzer);
-        buzzer = 0.0;
-        mp3_state=menu;
         lcdUpdate("[MP3] menu", "> "+musicList[selectMusicId].getName());
+        musicList[selectMusicId].stop(buzzer);
+        mp3_state=menu;
+        wait(0.5); //위치 중요
     }
 
     void playMusic() {
+        lcdUpdate("[MP3] playing", "> ");
+        wait(0.5); //위치 중요
         musicList[selectMusicId].play();
         mp3_state=playing;
-        lcdUpdate("[MP3] playing", "> ");
     }
 
     void lcdUpdate(string s1,string s2){

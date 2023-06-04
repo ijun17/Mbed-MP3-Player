@@ -16,19 +16,18 @@ private:
 
     int playID;  //재생중인 구간
     Timer timer;
-    float pauseTime;
-    
 
-    static const int PITCH[7];//{0,2,3,5,7,9,10};
-    int getOctave(int i){return pitches[i][pitches[i].length()-1]-'0';}  //pitchs[i]에서 옥타브 추출
-    int getPitch(int i){return PITCH[pitches[i][0]-'A'] + (pitches[i][1]=='#');}  //pitchs[i]에서 음계 추출
+    static const int PITCH[7];//{9,10,0,2,4,5,7}={A,B,C,D,E,F,G}
+    //pitchs[i]에서 옥타브 추출
+    int getOctave(int i){return pitches[i][pitches[i].length()-1]-'0';} 
+    //pitchs[i]에서 음계 추출
+    int getPitch(int i){return PITCH[pitches[i][0]-'A'] + (pitches[i][1]=='#');}
+    // 옥타브와 음계로 주파수 계산
     int getFrequency(int i) {
-        const int baseFrequency = 100; //440 A4의 기준 주파수
-        int n = getOctave(i) * 12 + getPitch(i); // 음계와 옥타브를 이용하여 n 계산
-        int frequency = baseFrequency*pow(2, n / 12.0); // 주파수 계산
-        return frequency;
+        const int baseFreq = 55; //기준 주파수(1옥타브 라)
+        return baseFreq * pow(2, getOctave(i)+getPitch(i)/12.0); // 주파수 반환
     }
-    float getTime(int i){return beats[i]/4.0 - pauseTime;}
+    float getTime(int i){return beats[i]/4.0;}
 public:
     Music(string name, string pitches[], string lyrics[], int beats[], int length)
         :name(name),pitches(pitches),lyrics(lyrics),beats(beats),length(length){}
@@ -36,31 +35,31 @@ public:
     bool isPlaying(){return playID<length;}
     string &getName() {return name;}
     string &getLyric() { return lyrics[playID]; }
-    void play(){
+
+    void play(){ //재생
         playID=-1; 
         timer.start();
     }
-    void stop(PwmOut& buzzer){
+    void stop(PwmOut& buzzer){ //중단
         playID=length;
         buzzer = 0.0;
         timer.reset();
     }
-    void pause(PwmOut& buzzer){
-        pauseTime+=timer.read();
+    void pause(PwmOut& buzzer){ //일시중지
         buzzer = 0.0;
-        timer.reset();
+        timer.stop();
     }
-    void unpause(PwmOut& buzzer){
+    void unpause(PwmOut& buzzer){ //일시중지 해제
         timer.start();
         buzzer = 0.5;
         buzzer.period(1.0 / getFrequency(playID));
     }
+
     bool update(PwmOut& buzzer){
         if(playID==-1 || (isPlaying() && getTime(playID) < timer.read())){
             buzzer = 0.5;
             playID++;
             timer.reset();
-            pauseTime=0;
             if(isPlaying()){
                 buzzer.period(1.0 / getFrequency(playID));
                 timer.start();
