@@ -1,0 +1,9 @@
+BUILD
+compile_commands.json
+.mbed
+.clangd
+.cache
+mbed
+liquidcrystal_i2c_hangul
+print
+TextLCD
