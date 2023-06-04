@@ -24,6 +24,8 @@ private:
 
     string lcdBuffer[2];
     bool lcdUpdated;
+    string selectedMusicName;
+    Timer nameTimer;
 
 public:
     MP3Player(PinName buzzorPin, PinName SDA, PinName SCL, PinName btn1, PinName btn2)
@@ -42,35 +44,51 @@ public:
         lcd.setCursor(TextLCD::CurOff_BlkOff);
 
         selectMusicId = 0;
+        selectedMusicName = musicList[selectMusicId].getName();
         mp3_state = menu;
-        lcdUpdate("[MP3] menu", "> "+musicList[selectMusicId].getName());
+        lcdUpdate("[MP3] menu", "> "+selectedMusicName);
 
-        int longNameMusicI=0;
-        Timer t1;
         wait(1);
+        nameTimer.start();
         while (true) {
+            //버튼 1 : 다음 노래, 일시 중지
             if(button1.read()){
                 if(mp3_state==menu)nextMusic();
                 else pauseMusic();
                 wait(0.5);
+                restartNameTimer();
             }
+            //버튼 2 : 재생, 중지
             if(button2.read()){
                 if(mp3_state==menu)playMusic();
                 else stopMusic();
                 wait(0.5);
+                restartNameTimer();
             }
-            if(mp3_state==playing){
+            //가사 출력
+            if(mp3_state==playing){ 
                 if(musicList[selectMusicId].update(buzzer)){
                     if(lcdBuffer[1].length()+musicList[selectMusicId].getLyric().length() <=16)
                         lcdUpdate("[MP3] playing", lcdBuffer[1]+musicList[selectMusicId].getLyric());
                     else lcdUpdate("[MP3] playing", "> "+musicList[selectMusicId].getLyric());
                 }
-                if(!musicList[selectMusicId].isPlaying())stopMusic();
+                if(!musicList[selectMusicId].isPlaying()){
+                    stopMusic();
+                    wait(0.5);
+                    restartNameTimer();
+                }
             }
-            if(mp3_state==menu && musicList[selectMusicId].getName().length()>14){
-
+            //긴 제목 오른쪽 시프트
+            if(mp3_state==menu && selectedMusicName.length()>14){
+                if(int(nameTimer) >= selectedMusicName.length())restartNameTimer();
+                lcdUpdate("[MP3] menu", "> "+selectedMusicName.substr(int(nameTimer),14));
             }
         }
+    }
+
+    void restartNameTimer(){
+        nameTimer.reset();
+        nameTimer.start();
     }
 
     void addMusic(Music &music) { musicList.push_back(music); }
@@ -78,6 +96,7 @@ public:
     void nextMusic() { //다음 노래를 선택
         if (++selectMusicId == musicList.size())selectMusicId = 0;
         lcdUpdate("", "> "+musicList[selectMusicId].getName());
+        selectedMusicName = musicList[selectMusicId].getName();
     }
 
     void pauseMusic() { //노래를 일시정지
@@ -102,6 +121,7 @@ public:
     void playMusic() {
         musicList[selectMusicId].play();
         mp3_state=playing;
+        lcdUpdate("[MP3] playing", "> ");
     }
 
     void lcdUpdate(string s1,string s2){
