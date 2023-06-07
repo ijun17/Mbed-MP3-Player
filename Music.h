@@ -17,14 +17,14 @@ private:
     int playID;  //재생중인 구간
     Timer timer;
 
-    static const int PITCH[7];//{9,10,0,2,4,5,7}={A,B,C,D,E,F,G}
+    static const int PITCH[7];//{9,11,0,2,4,5,7}={A,B,C,D,E,F,G}
     //pitchs[i]에서 옥타브 추출
     int getOctave(int i){return pitches[i][pitches[i].length()-1]-'0';} 
     //pitchs[i]에서 음계 추출
     int getPitch(int i){return PITCH[pitches[i][0]-'A'] + (pitches[i][1]=='#');}
     // 옥타브와 음계로 주파수 계산
-    int getFrequency(int i) {
-        const int baseFreq = 55; //기준 주파수(1옥타브 라)
+    float getFrequency(int i) {
+        const float baseFreq = 32.70; //기준 주파수(1옥타브 도)
         return baseFreq * pow(2, getOctave(i)+getPitch(i)/12.0); // 주파수 반환
     }
     float getTime(int i){return beats[i]/4.0;}
@@ -70,4 +70,4 @@ public:
     }
 };
 
-const int Music::PITCH[7]={9,10,0,2,4,5,7};//{0,2,3,5,7,9,10};//
+const int Music::PITCH[7]={9,11,0,2,4,5,7};

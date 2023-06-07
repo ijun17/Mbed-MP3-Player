@@ -90,7 +90,7 @@ public:
         if (++selectMusicId == musicList.size())selectMusicId = 0;
         lcdUpdate("", "> "+musicList[selectMusicId].getName());
         selectedMusicName = musicList[selectMusicId].getName();
-        wait(0.5); //위치 중요
+        wait(0.1);
     }
 
     void pauseMusic() { //노래를 일시정지
@@ -98,10 +98,10 @@ public:
             lcdUpdate("[MP3] pause", "");
             musicList[selectMusicId].pause(buzzer);
             mp3_state=pause;
-            wait(0.5); //위치 중요
+            wait(0.1);
         }else{
             lcdUpdate("[MP3] playing", "");
-            wait(0.5); //위치 중요
+            wait(0.1);
             musicList[selectMusicId].unpause(buzzer);
             mp3_state=playing;
             
@@ -112,12 +112,12 @@ public:
         lcdUpdate("[MP3] menu", "> "+musicList[selectMusicId].getName());
         musicList[selectMusicId].stop(buzzer);
         mp3_state=menu;
-        wait(0.5); //위치 중요
+        wait(0.1); 
     }
 
     void playMusic() {
         lcdUpdate("[MP3] playing", "> ");
-        wait(0.5); //위치 중요
+        wait(0.1); 
         musicList[selectMusicId].play();
         mp3_state=playing;
     }
